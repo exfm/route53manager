@@ -2,7 +2,7 @@ from boto.route53.exception import DNSServerError
 from boto.route53.record import ResourceRecordSets
 from flask import Blueprint, redirect, url_for, render_template, request, abort, flash
 
-from route53.forms import RecordForm, RecordAliasForm, EditRecordForm
+from route53.forms import RecordForm, RecordAliasForm, EditRecordForm, DeleteRecordAliasForm
 from route53.connection import get_connection
 
 
@@ -28,6 +28,8 @@ def new_alias(zone_id):
         change.set_alias(form.alias_hosted_zone_id.data,
             form.alias_dns_name.data)
         changes.commit()
+        flash('New alias %s for %s created!' % (form.type.data, form.name.data))
+        return redirect(url_for('zones.detail', zone_id=zone_id))
 
     elbs = get_connection('elb').get_all_load_balancers()
 
@@ -55,6 +57,8 @@ def update_alias(zone_id):
             form.alias_dns_name.data)
 
         changes.commit()
+        flash('Updated alias %s for %s' % (form.type.data, form.name.data))
+        return redirect(url_for('zones.detail', zone_id=zone_id))
 
     elbs = get_connection('elb').get_all_load_balancers()
 
@@ -64,7 +68,27 @@ def update_alias(zone_id):
 
 @records.route('/<zone_id>/alias/delete', methods=['GET', 'POST'])
 def delete_alias(zone_id):
-    pass
+    conn = get_connection()
+    zone = get_zone(zone_id, conn)
+    form = DeleteRecordAliasForm(request.values)
+
+    if request.method == "GET":
+        if form.values:
+            abort(404)
+
+    error = None
+    if request.method == "POST":
+        changes = ResourceRecordSets(conn, zone_id, '')
+        change = changes.add_change("DELETE", form.name.data, form.type.data)
+        change.set_alias(form.alias_hosted_zone_id.data,
+            form.alias_dns_name.data)
+
+        changes.commit()
+        flash('Deleted alias %s' % form.name.data)
+        return redirect(url_for('zones.detail', zone_id=zone_id))
+
+    return render_template('records/delete_alias.html', zone=zone,
+        zone_id=zone_id, error=error, form=form)
 
 
 @records.route('/<zone_id>/new', methods=['GET', 'POST'])
@@ -107,7 +131,7 @@ def delete(zone_id):
         return redirect(url_for('zones.detail', zone_id=zone_id))
 
     return render_template('records/delete.html', zone=zone, zone_id=zone_id,
-        error=error)
+        error=error, form=form)
 
 
 @records.route('/<zone_id>/update', methods=['GET', 'POST'])

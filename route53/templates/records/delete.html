@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-<form action="{{ url_for('records.records_delete', zone_id=zone_id) }}" method="post">
+<form action="{{ url_for('records.delete', zone_id=zone_id) }}" method="post">
   <input type="hidden" value="{{ val_dict['name'] }}" name="data_name" />
   <input type="hidden" value="{{ val_dict['type'] }}" name="data_type" />
   <input type="hidden" value="{{ val_dict['ttl'] }}" name="data_ttl" />

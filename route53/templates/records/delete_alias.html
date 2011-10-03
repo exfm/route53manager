@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block header %}
+    <h1>Delete alias {{ form.type.data }} {{ form.name.data }}?</h1>
+{% endblock %}
+
+{% block body %}
+<form action="{{ url_for('records.delete_alias', zone_id=zone_id) }}" method="post">
+    {{form.hidden_tag()}}
+    <div style="display: none;">
+        {{ render_field(form.type) }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.alias_hosted_zone_id) }}
+        {{ render_field(form.alias_dns_name) }}
+        {{ render_field(form.ttl) }}
+        {{ render_field(form.comment) }}
+    </div>
+
+    <div class="actions">
+        <button type="submit" class="btn primary">Yes, delete it</button>
+        <a class="btn" href="{{ url_for('zones.detail', zone_id=zone_id) }}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

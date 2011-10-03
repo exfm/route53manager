@@ -1,6 +1,5 @@
 from flaskext.wtf import (validators, HiddenField, SelectField,
     TextField, Form, TextAreaField, IntegerField)
-from flask import request
 
 
 RECORD_CHOICES = [
@@ -76,7 +75,7 @@ class EditRecordForm(RecordForm):
 class RecordAliasForm(Form):
     type = SelectField("Type", choices=ALIAS_RECORD_CHOICES)
     name = TextField("Name", validators=[validators.Required()])
-    alias_hosted_zone_id = TextField("Alias hosted zone ID",
+    alias_hosted_zone_id = TextField("Alias Hosted Zone ID",
         validators=[validators.Required()])
 
     alias_dns_name = TextField("Alias DNS name", validators=[validators.Required()])
@@ -85,6 +84,31 @@ class RecordAliasForm(Form):
             validators=[validators.Required()])
 
     comment = TextAreaField("Comment")
+
+    @property
+    def values(self):
+        return None
+
+
+class DeleteRecordAliasForm(RecordAliasForm):
+    pass
+
+
+class EditRecordAliasForm(RecordAliasForm):
+    previous_type = PreviousHiddenField("Type",
+        validators=[validators.Required()])
+
+    previous_name = PreviousHiddenField("Name",
+        validators=[validators.Required()])
+
+    previous_alias_hosted_zone_id = PreviousHiddenField("Previous Alias Hosted Zone ID",
+        validators=[validators.Required()])
+
+    previous_alias_dns_name = PreviousHiddenField("Previous Alias DNS Name",
+        validators=[validators.Required()])
+
+    previous_ttl = PreviousHiddenField("TTL",
+        validators=[validators.Required()])
 
 
 class APIKeyForm(Form):
