@@ -124,9 +124,12 @@ def delete(zone_id):
 
     error = None
     if request.method == "POST":
-        changes = ResourceRecordSets(conn, zone_id, '')
-        changes.add_change("DELETE", form.name.data, form.type.data)
+        changes = ResourceRecordSets(conn, zone_id, form.comment.data)
+        change = changes.add_change("DELETE", form.name.data, form.type.data, form.ttl.data)
+        change.set_alias(None, None)
+        [change.add_value(v) for v in form.values]
         changes.commit()
+
         flash('Deleted record %s' % form.name.data)
         return redirect(url_for('zones.detail', zone_id=zone_id))
 

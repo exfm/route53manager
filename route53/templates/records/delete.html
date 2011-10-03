@@ -1,22 +1,22 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
 
 {% block header %}
-  <h1>Delete record {{ val_dict['type'] }} {{ val_dict['name'] }}?</h1>
+  <h1>Delete record {{ form.type.data }} {{ form.name.data }}?</h1>
 {% endblock %}
 
 {% block body %}
 <form action="{{ url_for('records.delete', zone_id=zone_id) }}" method="post">
-  <input type="hidden" value="{{ val_dict['name'] }}" name="data_name" />
-  <input type="hidden" value="{{ val_dict['type'] }}" name="data_type" />
-  <input type="hidden" value="{{ val_dict['ttl'] }}" name="data_ttl" />
-  <input type="hidden" value="{{ alias_hosted_zone_id }}" name="data_alias_hosted_zone_id" />
-  <input type="hidden" value="{{ alias_dns_name }}" name="data_alias_dns_name" />
-  {% for value in values %}
-  <input type="hidden" value="{{ value }}" name="data_value" />
-  {% endfor %}
+  {{form.hidden_tag()}}
+  <div style="display: none;">
+        {{ render_field(form.type) }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.values) }}
+        {{ render_field(form.ttl) }}
+    </div>
   <div class="actions">
     <button type="submit" class="btn primary">Yes, delete it</button>
-    <a class="btn" href="{{ url_for('zones.zones_records', zone_id=zone_id) }}">Cancel</a>
+    <a class="btn" href="{{ url_for('zones.detail', zone_id=zone_id) }}">Cancel</a>
   </div>
 </form>
 {% endblock %}
