@@ -33,8 +33,7 @@ def urlencode(s):
 auth_users = app.config.get('AUTH_USERS', None)
 if auth_users:
     authDB = FlaskRealmDigestDB('Route53Realm')
-
-    for user,password in auth_users:
+    for user, password in auth_users:
         authDB.add_user(user, password)
 
     app.wsgi_app = AuthMiddleware(app.wsgi_app, authDB)
