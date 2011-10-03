@@ -4,3 +4,4 @@ Flask-WTF==0.5.1
 simplejson
 -e git://github.com/boto/boto.git#egg=boto
 pyactiveresource==1.0.1
+flask-script
