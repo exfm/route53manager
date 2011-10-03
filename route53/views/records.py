@@ -7,37 +7,41 @@ from route53.connection import get_connection
 from route53.xmltools import render_change_batch
 
 
+def get_zone(zone_id, conn=None):
+    if not conn:
+        conn = get_connection()
+    return conn.get_hosted_zone(zone_id)['GetHostedZoneResponse']['HostedZone']
+
+
 records = Blueprint('records', __name__)
 
-@records.route('/<zone_id>/alias', methods=['GET', 'POST'])
+
+@records.route('/<zone_id>/alias/new', methods=['GET', 'POST'])
 def records_alias(zone_id):
     conn = get_connection()
-    zone = conn.get_hosted_zone(zone_id)['GetHostedZoneResponse']['HostedZone']
+    zone = get_zone(zone_id, conn)
     error = None
     form = RecordAliasForm(request.values, csrf_enabled=False)
 
     if form.validate_on_submit():
-        print "Valid.  gonna do it"
-        changes = ResourceRecordSets(conn, zone_id, form.comment.data)
-        change = changes.add_change("DELETE", form.name.data, form.type.data)
-        change.set_alias(form.alias_hosted_zone_id.data, form.alias_dns_name.data)
 
+        changes = ResourceRecordSets(conn, zone_id, form.comment.data)
+
+        change = changes.add_change("DELETE", form.name.data, form.type.data)
+        change.set_alias(form.alias_hosted_zone_id.data,
+            form.alias_dns_name.data)
+
+        change = changes.add_change("CREATE", form.name.data, form.type.data)
+        change.set_alias(form.alias_hosted_zone_id.data,
+            form.alias_dns_name.data)
         changes.commit()
 
-        changes = ResourceRecordSets(conn, zone_id, form.comment.data)
-        change = changes.add_change("CREATE", form.name.data, form.type.data)
-        change.set_alias(form.alias_hosted_zone_id.data, form.alias_dns_name.data)
-        print changes.commit()
-        print "done"
-    print form.errors
     elbs = get_connection('elb').get_all_load_balancers()
 
-    return render_template('records/alias.html',
-                           form=form,
-                           zone=zone,
-                           zone_id=zone_id,
-                           error=error,
-                           elbs=elbs)
+    return render_template('records/new_alias.html', form=form, zone=zone,
+        zone_id=zone_id, error=error, elbs=elbs)
+
+
 
 @records.route('/<zone_id>/new', methods=['GET', 'POST'])
 def records_new(zone_id):
@@ -47,9 +51,11 @@ def records_new(zone_id):
     form = RecordForm()
     error = None
     if form.validate_on_submit():
+
         change_batch = ChangeBatch(change_id='',
                                    status='created',
                                    comment=form.comment.data)
+
         db.session.add(change_batch)
         change = Change(action="CREATE",
                         name=form.name.data,
@@ -103,8 +109,8 @@ def records_delete(zone_id):
 
     if request.method == "GET":
         values = request.args.getlist('value')
-        alias_hosted_zone_id = request.args.get('alias_hosted_zone_id', None)
-        alias_dns_name = request.args.get('alias_dns_name', None)
+        alias_hosted_zone_id = request.values.get('alias_hosted_zone_id', None)
+        alias_dns_name = request.values.get('alias_dns_name', None)
         if not values and not alias_hosted_zone_id and not alias_dns_name:
             abort(404)
 
