@@ -12,8 +12,7 @@
 <table class="zebra-striped">
   {% for zone in zones %}
   <tr>
-    <td style="width: 60%;"><h2><a href="{{ url_for('zones.detail', zone_id=zone['Id']|shortid) }}">{{ zone['Name'] }}</a></h2></td>
-    <td><a href="{{ url_for('zones.detail', zone_id=zone['Id']|shortid) }}" class="btn"><small>View Records</small></a></td>
+    <td style="width: 75%;"><h2><a href="{{ url_for('zones.detail', zone_id=zone['Id']|shortid) }}">{{ zone['Name'] }}</a></h2></td>
     <td><a href="{{ url_for('zones.clone', zone_id=zone['Id']|shortid) }}" class="btn"><small>Clone</small></a></td>
     <td><a href="{{ url_for('zones.delete', zone_id=zone['Id']|shortid) }}" class="btn danger"><small>Delete</small></a></td>
   </tr>
