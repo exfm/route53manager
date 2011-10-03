@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-<form action="{{url_for('zones.zones_new')}}" method="post" accept-charset="utf-8" class="form-stacked">
+<form action="{{url_for('zones.new')}}" method="post" accept-charset="utf-8" class="form-stacked">
   {{ form.csrf_token }}
   <fieldset>
     {{ render_field(form.name) }}
@@ -14,7 +14,7 @@
   </fieldset>
   <div class="actions">
     <button type="submit" class="btn primary">Add</button>
-    <a href="{{ url_for('zones.zones_list') }}" class="btn">Cancel</a>
+    <a href="{{ url_for('zones.index') }}" class="btn">Cancel</a>
   </div>
 </form>
 {% block afterform %}{% endblock %}
