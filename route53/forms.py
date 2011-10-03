@@ -47,7 +47,8 @@ class RecordForm(wtf.Form):
 class RecordAliasForm(wtf.Form):
     type = wtf.SelectField("Type", choices=ALIAS_RECORD_CHOICES)
     name = wtf.TextField("Name", validators=[validators.Required()])
-    alias_hosted_zone_id = wtf.TextField("Alias hosted zone ID", validators=[validators.Required()])
+    alias_hosted_zone_id = wtf.TextField("Alias hosted zone ID",
+        validators=[validators.Required()])
 
     alias_dns_name = wtf.TextField("Alias DNS name", validators=[validators.Required()])
 

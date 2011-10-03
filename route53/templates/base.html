@@ -117,7 +117,14 @@
 
     <script>
       $(function(){
-        $('[rel=popover]').popover();
+        $('[rel=popover]').popover({offset: 10}).click(function(e){e.preventDefault()});
+
+        $('a[rel=form-fill]').click(function(){
+            var el_data = $(this).data();
+            for(k in el_data){
+              $('form').find('input[name='+k+']').val(el_data[k]);
+            }
+        });
       });
     </script>
 

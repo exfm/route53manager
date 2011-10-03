@@ -1,0 +1,46 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+
+{% block header %}
+  <h1>Alias</h1>
+{% endblock %}
+{% block body %}
+
+{% if error %}
+<p class="error">{{ error.error_message }}</p>
+{% endif %}
+
+<div class="row">
+<div class="span8">
+<form action="{{ url_for('records.records_alias', zone_id=zone_id) }}" method="post" accept-charset="utf-8" class="form-stacked">
+  <fieldset>
+  {{ form.csrf_token }}
+
+  {{ render_field(form.type) }}
+  {{ render_field(form.name) }}
+  {{ render_field(form.alias_hosted_zone_id) }}
+  {{ render_field(form.alias_dns_name) }}
+  {{ render_field(form.ttl) }}
+  {{ render_field(form.comment) }}
+
+  </fieldset>
+  <div class="actions">
+    <button type="submit" class="btn primary">Save</button>
+    <a class="btn" href="{{ url_for('zones.zones_records', zone_id=zone_id) }}">Cancel</a>
+  </div>
+</form>
+</div>
+
+<div class="span6">
+    <h2>Your ELB's</h2>
+    <dl>
+        {% for elb in elbs %}
+            <dt><a href="#" id="elb-{{elb.name}}" rel="form-fill" data-alias_dns_name="{{elb.canonical_hosted_zone_name}}" data-alias_hosted_zone_id="{{elb.canonical_hosted_zone_name_id}}">{{elb.name}}</a></dt>
+            <dd>{{elb.canonical_hosted_zone_name}}</dd>
+            <dd>{{elb.canonical_hosted_zone_name_id}}</dd>
+            </li>
+        {% endfor %}
+    </dl>
+</div>
+</div>
+{% endblock %}

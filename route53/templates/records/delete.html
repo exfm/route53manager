@@ -6,13 +6,15 @@
   <li>Delete record {{ val_dict['type'] }} {{ val_dict['name'] }}</li>
 {% endblock %}
 
+{% block header %}
+  <h1>Delete record {{ val_dict['type'] }} {{ val_dict['name'] }}?</h1>
+{% endblock %}
+
 {% block body %}
-<h2>Delete record</h2>
 {% if error %}
 <p class="error">{{ error.error_message }}</p>
 {% endif %}
 <form action="{{ url_for('records.records_delete', zone_id=zone_id) }}" method="post" accept-charset="utf-8">
-  <p>Are you sure?</p>
   <input type="hidden" value="{{ val_dict['name'] }}" name="data_name" />
   <input type="hidden" value="{{ val_dict['type'] }}" name="data_type" />
   <input type="hidden" value="{{ val_dict['ttl'] }}" name="data_ttl" />
@@ -21,9 +23,9 @@
   {% for value in values %}
   <input type="hidden" value="{{ value }}" name="data_value" />
   {% endfor %}
-  <p>
-    <button type="submit">Yes</button>
-    <a class="button" href="{{ url_for('zones.zones_records', zone_id=zone_id) }}">No</a>
-  </p>
+  <div class="actions">
+    <button type="submit" class="btn primary">Yes, delete it</button>
+    <a class="btn" href="{{ url_for('zones.zones_records', zone_id=zone_id) }}">Cancel</a>
+  </div>
 </form>
 {% endblock %}

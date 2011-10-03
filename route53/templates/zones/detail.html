@@ -37,6 +37,7 @@
         <th>TTL</th>
         <th></th>
         <th></th>
+        <th></th>
     </thead>
 
     {% for groupname, recordsets in groups %}
@@ -45,22 +46,21 @@
     <tr>
         <td>{{ groupname }}</td>
         <td>
-            <strong>{{ recordset.name }}</strong> -> {{recordset.resource_records|join(',')}}
+            <a rel="popover" data-content="{{ recordset.comments }}" data-original-title="Comments">{{ recordset.name }}</a> -> {{recordset.resource_records|join(',')}}
             {% if recordset.alias_dns_name and recordset.alias_hosted_zone_id %}
-            <p>{{ recordset.to_print() }}</p>
+            <p>{{ recordset.to_print() }} </p>
             {% endif %}
         </td>
         <td>{{ recordset.ttl }}</td> <!-- converts secs to mins, hours, days, or whatevs -->
-            {% if recordset.resource_records %}
-            <td>
-                <a href="{{ url_for('records.records_update', zone_id=zone_id) }}?type={{ recordset.type|urlencode }}&amp;name={{ recordset.name|urlencode }}{% for value in recordset.resource_records %}&amp;value={{ value|urlencode }}{% endfor %}&amp;ttl={{ recordset.ttl }}" class="btn">Edit</a>
-            </td>
-            <td>
-                <a href="{{ url_for('records.records_delete', zone_id=zone_id) }}?type={{ recordset.type|urlencode }}&amp;name={{ recordset.name|urlencode }}{% for value in recordset.resource_records %}&amp;value={{ value|urlencode }}{% endfor %}&amp;ttl={{ recordset.ttl }}{% if recordset.alias_dns_name %}&amp;alias_dns_name={{ recordset.alias_dns_name|urlencode }}{% endif %}{% if recordset.alias_hosted_zone_id %}&amp;alias_hosted_zone_id={{ recordset.alias_hosted_zone_id|urlencode }}{% endif %}" class="btn danger">Delete</a>
-            </td>
-            {% else %}
-                <td colspan="2"><em>(This record cannot be edited)</em></td>
-            {% endif %}
+        <td>
+            <a href="{{ url_for('records.records_update', zone_id=zone_id) }}?type={{ recordset.type|urlencode }}&amp;name={{ recordset.name|urlencode }}{% for value in recordset.resource_records %}&amp;value={{ value|urlencode }}{% endfor %}&amp;ttl={{ recordset.ttl }}" class="btn">Edit</a>
+        </td>
+        <td>
+            <a href="{{ url_for('records.records_alias', zone_id=zone_id) }}?type={{ recordset.type|urlencode }}&amp;name={{ recordset.name|urlencode }}{% for value in recordset.resource_records %}&amp;value={{ value|urlencode }}{% endfor %}&amp;ttl={{ recordset.ttl }}" class="btn">Alias</a>
+        </td>
+        <td>
+            <a href="{{ url_for('records.records_delete', zone_id=zone_id) }}?type={{ recordset.type|urlencode }}&amp;name={{ recordset.name|urlencode }}{% for value in recordset.resource_records %}&amp;value={{ value|urlencode }}{% endfor %}&amp;ttl={{ recordset.ttl }}{% if recordset.alias_dns_name %}&amp;alias_dns_name={{ recordset.alias_dns_name|urlencode }}{% endif %}{% if recordset.alias_hosted_zone_id %}&amp;alias_hosted_zone_id={{ recordset.alias_hosted_zone_id|urlencode }}{% endif %}" class="btn danger">Delete</a>
+        </td>
     </tr>
     {% endfor %}
     {% endfor %}

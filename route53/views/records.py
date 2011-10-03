@@ -1,13 +1,43 @@
 from boto.route53.exception import DNSServerError
+from boto.route53.record import ResourceRecordSets
 from flask import Blueprint, redirect, url_for, render_template, request, abort
 
-from route53.forms import RecordForm
+from route53.forms import RecordForm, RecordAliasForm
 from route53.connection import get_connection
 from route53.xmltools import render_change_batch
 
 
 records = Blueprint('records', __name__)
 
+@records.route('/<zone_id>/alias', methods=['GET', 'POST'])
+def records_alias(zone_id):
+    conn = get_connection()
+    zone = conn.get_hosted_zone(zone_id)['GetHostedZoneResponse']['HostedZone']
+    error = None
+    form = RecordAliasForm(request.values, csrf_enabled=False)
+
+    if form.validate_on_submit():
+        print "Valid.  gonna do it"
+        changes = ResourceRecordSets(conn, zone_id, form.comment.data)
+        change = changes.add_change("DELETE", form.name.data, form.type.data)
+        change.set_alias(form.alias_hosted_zone_id.data, form.alias_dns_name.data)
+
+        changes.commit()
+
+        changes = ResourceRecordSets(conn, zone_id, form.comment.data)
+        change = changes.add_change("CREATE", form.name.data, form.type.data)
+        change.set_alias(form.alias_hosted_zone_id.data, form.alias_dns_name.data)
+        print changes.commit()
+        print "done"
+    print form.errors
+    elbs = get_connection('elb').get_all_load_balancers()
+
+    return render_template('records/alias.html',
+                           form=form,
+                           zone=zone,
+                           zone_id=zone_id,
+                           error=error,
+                           elbs=elbs)
 
 @records.route('/<zone_id>/new', methods=['GET', 'POST'])
 def records_new(zone_id):
@@ -27,6 +57,7 @@ def records_new(zone_id):
                         ttl=form.ttl.data,
                         values={'values': form.values},
                         change_batch_id=change_batch.id)
+
         db.session.add(change)
         rendered_xml = render_change_batch({'changes': [change],
                                             'comment': change_batch.comment})
@@ -123,7 +154,8 @@ def records_update(zone_id):
     if request.method == "GET":
         values = request.args.getlist('value')
         if not values:
-            abort(404)
+            return redirect(url_for('.records_alias', zone_id=zone_id, **request.values.to_dict()))
+
         initial_data = dict(val_dict)
         initial_data['value'] = ';'.join(values)
         form = RecordForm(**initial_data)
