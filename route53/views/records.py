@@ -1,12 +1,12 @@
 from boto.route53.exception import DNSServerError
-from flask import Module, redirect, url_for, render_template, request, abort
+from flask import Blueprint, redirect, url_for, render_template, request, abort
 
 from route53.forms import RecordForm
 from route53.connection import get_connection
 from route53.xmltools import render_change_batch
 
 
-records = Module(__name__)
+records = Blueprint('records', __name__)
 
 
 @records.route('/<zone_id>/new', methods=['GET', 'POST'])
@@ -56,7 +56,7 @@ def get_record_fields():
         if request.method == "GET":
             result = request.args.get(field, None)
         elif request.method == "POST":
-            result = request.form.get("data_"+field, None)
+            result = request.form.get("data_" + field, None)
         if result is None:
             abort(404)
         val_dict[field] = result
@@ -102,6 +102,7 @@ def records_delete(zone_id):
             return redirect(url_for('zones.zones_records', zone_id=zone_id))
         except DNSServerError as error:
             error = error
+
     return render_template('records/delete.html',
                            val_dict=val_dict,
                            values=values,

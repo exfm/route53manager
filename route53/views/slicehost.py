@@ -2,7 +2,7 @@ from boto.route53.exception import DNSServerError
 from functools import wraps
 from itertools import groupby
 
-from flask import Module, session, redirect, url_for, render_template, request
+from flask import Blueprint, session, redirect, url_for, render_template, request
 
 from pyactiveresource.activeresource import ActiveResource
 
@@ -10,7 +10,7 @@ from route53.connection import get_connection
 from route53.forms import APIKeyForm
 from route53.xmltools import render_change_batch
 
-slicehost = Module(__name__)
+slicehost = Blueprint('slicehost', __name__)
 
 API_KEY = 'slicehost_api_key'
 API_URL = 'https://%s@api.slicehost.com/'

@@ -1,6 +1,6 @@
 from boto.route53.exception import DNSServerError
 from itertools import groupby
-from flask import Module
+from flask import Blueprint
 
 from flask import url_for, render_template, \
         redirect, flash, request
@@ -10,7 +10,7 @@ from route53.connection import get_connection
 
 from route53.xmltools import render_change_batch
 
-zones = Module(__name__)
+zones = Blueprint('zones', __name__)
 
 
 @zones.route('/')
@@ -73,10 +73,20 @@ def zones_detail(zone_id):
     zone = resp['GetHostedZoneResponse']['HostedZone']
     nameservers = resp['GetHostedZoneResponse']['DelegationSet']['NameServers']
 
+    resp = conn.get_hosted_zone(zone_id)
+    zone = resp['GetHostedZoneResponse']['HostedZone']
+
+    record_resp = sorted(conn.get_all_rrsets(zone_id), key=lambda x: x.type)
+
+    groups = groupby(record_resp, key=lambda x: x.type)
+
+    groups = [(k, list(v)) for k, v in groups]
+
     return render_template('zones/detail.html',
             zone_id=zone_id,
             zone=zone,
-            nameservers=nameservers)
+            nameservers=nameservers,
+            groups=groups)
 
 
 @zones.route('/<zone_id>/records')

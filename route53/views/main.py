@@ -1,6 +1,6 @@
-from flask import redirect, Module, url_for, request
+from flask import redirect, Blueprint, url_for
 
-main = Module(__name__)
+main = Blueprint('main', __name__)
 
 
 @main.route('/')

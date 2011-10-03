@@ -10,10 +10,10 @@ from route53.views.slicehost import slicehost
 from auth import FlaskRealmDigestDB, AuthMiddleware
 
 app = Flask(__name__)
-app.register_module(main)
-app.register_module(zones, url_prefix='/zones')
-app.register_module(records, url_prefix='/records')
-app.register_module(slicehost, url_prefix='/slicehost')
+app.register_blueprint(main)
+app.register_blueprint(zones, url_prefix='/zones')
+app.register_blueprint(records, url_prefix='/records')
+app.register_blueprint(slicehost, url_prefix='/slicehost')
 
 # load configuration
 app.config.from_pyfile('application.cfg')

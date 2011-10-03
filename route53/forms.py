@@ -15,6 +15,11 @@ RECORD_CHOICES = [
     ('TXT', 'TXT'),
 ]
 
+ALIAS_RECORD_CHOICES = [
+    ('A', 'A'),
+    ('AAAA', 'AAAA'),
+]
+
 
 class ZoneForm(wtf.Form):
     name = wtf.TextField('Domain Name', validators=[validators.Required()])
@@ -38,14 +43,19 @@ class RecordForm(wtf.Form):
         else:
             return [self.value.data.strip()]
 
+
 class RecordAliasForm(wtf.Form):
-    type = wtf.SelectField("Type", choices=RECORD_CHOICES)
+    type = wtf.SelectField("Type", choices=ALIAS_RECORD_CHOICES)
     name = wtf.TextField("Name", validators=[validators.Required()])
     alias_hosted_zone_id = wtf.TextField("Alias hosted zone ID", validators=[validators.Required()])
+
     alias_dns_name = wtf.TextField("Alias DNS name", validators=[validators.Required()])
+
     ttl = wtf.IntegerField("TTL", default="86400",
             validators=[validators.Required()])
+
     comment = wtf.TextAreaField("Comment")
+
 
 class APIKeyForm(wtf.Form):
     key = wtf.TextField('API Key', validators=[validators.Required()])
