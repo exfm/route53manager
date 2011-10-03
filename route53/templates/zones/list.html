@@ -4,7 +4,7 @@
   <li>Zones</li>
 {% endblock %}
 {% block header %}
-<h1>Zones <a href="{{ url_for('zones.zones_new') }}" class="btn primary">Add new zone</a></h1>
+<h1>Zones <a href="{{ url_for('zones.new') }}" class="btn primary">Add new zone</a></h1>
 {% endblock %}
 
 {% block body %}
@@ -12,10 +12,10 @@
 <table class="zebra-striped">
   {% for zone in zones %}
   <tr>
-    <td style="width: 60%;"><h2><a href="{{ url_for('zones.zones_detail', zone_id=zone['Id']|shortid) }}">{{ zone['Name'] }}</a></h2></td>
-    <td><a href="{{ url_for('zones.zones_detail', zone_id=zone['Id']|shortid) }}" class="btn"><small>View Records</small></a></td>
-    <td><a href="{{ url_for('zones.zones_clone', zone_id=zone['Id']|shortid) }}" class="btn"><small>Clone</small></a></td>
-    <td><a href="{{ url_for('zones.zones_delete', zone_id=zone['Id']|shortid) }}" class="btn danger"><small>Delete</small></a></td>
+    <td style="width: 60%;"><h2><a href="{{ url_for('zones.detail', zone_id=zone['Id']|shortid) }}">{{ zone['Name'] }}</a></h2></td>
+    <td><a href="{{ url_for('zones.detail', zone_id=zone['Id']|shortid) }}" class="btn"><small>View Records</small></a></td>
+    <td><a href="{{ url_for('zones.clone', zone_id=zone['Id']|shortid) }}" class="btn"><small>Clone</small></a></td>
+    <td><a href="{{ url_for('zones.delete', zone_id=zone['Id']|shortid) }}" class="btn danger"><small>Delete</small></a></td>
   </tr>
   {% endfor %}
 </table>

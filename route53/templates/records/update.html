@@ -1,39 +1,21 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 
-{% block breadcrumbs %}
-  <li><a href="{{ url_for('zones.zones_list') }}">Zones</a></li>
-  <li><a href="{{ url_for('zones.zones_records', zone_id=zone_id) }}">Records for {{ zone['Name'] }}</a></li>
-  <li>Update record {{ val_dict['type'] }} {{ val_dict['name'] }}</li>
-{% endblock %}
 {% block header %}
-  <h1>Update {{ val_dict['type'] }} {{ val_dict['name'] }}</h1>
+    <h1>Update {{ zone['Name'] }}</h1>
 {% endblock %}
+
 {% block body %}
-
-{% if error %}
-<p class="error">{{ error.error_message }}</p>
-{% endif %}
-<form action="{{ url_for('records.records_update', zone_id=zone_id) }}" method="post" accept-charset="utf-8" class="form-stacked">
-  <fieldset>
-  {{ form.csrf_token }}
-
-  {{ render_field(form.type) }}
-  {{ render_field(form.name) }}
-  {{ render_field(form.value) }}
-  {{ render_field(form.ttl) }}
-  {{ render_field(form.comment) }}
-
-  <input type="hidden" value="{{ val_dict['name'] }}" name="data_name" />
-  <input type="hidden" value="{{ val_dict['type'] }}" name="data_type" />
-  <input type="hidden" value="{{ val_dict['ttl'] }}" name="data_ttl" />
-  {% for value in values %}
-    <input type="hidden" value="{{ value }}" name="data_value" />
-  {% endfor %}
-  </fieldset>
-  <div class="actions">
-    <button type="submit" class="btn primary">Save</button>
-    <a class="btn" href="{{ url_for('zones.zones_records', zone_id=zone_id) }}">Cancel</a>
-  </div>
+<form action="{{url_for('records.update', zone_id=zone_id)}}" method="POST">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.type) }}
+    {{ render_field(form.name) }}
+    {{ render_field(form.value) }}
+    {{ render_field(form.ttl) }}
+    {{ render_field(form.comment) }}
+    <div class="actions">
+        <button type="submit" class="btn primary">Save</button>
+        <a class="btn" href="{{ url_for('zones.detail', zone_id=zone_id) }}">Cancel</a>
+    </div>
 </form>
 {% endblock %}

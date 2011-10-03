@@ -1,7 +1,7 @@
 {% extends "zones/new.html" %}
 
 {% block breadcrumbs %}
-  <li><a href="{{ url_for('zones.zones_list') }}">Zones</a></li>
+  <li><a href="{{ url_for('zones.index') }}">Zones</a></li>
   <li>Clone zone "{{ original_zone['Name'] }}"</li>
 {% endblock %}
 

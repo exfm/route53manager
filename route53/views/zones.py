@@ -14,7 +14,7 @@ zones = Blueprint('zones', __name__)
 
 
 @zones.route('/')
-def zones_list():
+def index():
     conn = get_connection()
     response = conn.get_all_hosted_zones()
     zones = response['ListHostedZonesResponse']['HostedZones']
@@ -22,7 +22,7 @@ def zones_list():
 
 
 @zones.route('/new', methods=['GET', 'POST'])
-def zones_new():
+def new():
     conn = get_connection()
 
     form = ZoneForm()
@@ -45,7 +45,7 @@ def zones_new():
 
 
 @zones.route('/<zone_id>/delete', methods=['GET', 'POST'])
-def zones_delete(zone_id):
+def delete(zone_id):
     conn = get_connection()
     zone = conn.get_hosted_zone(zone_id)['GetHostedZoneResponse']['HostedZone']
 
@@ -67,7 +67,7 @@ def zones_delete(zone_id):
 
 
 @zones.route('/<zone_id>')
-def zones_detail(zone_id):
+def detail(zone_id):
     conn = get_connection()
     resp = conn.get_hosted_zone(zone_id)
     zone = resp['GetHostedZoneResponse']['HostedZone']
@@ -89,26 +89,8 @@ def zones_detail(zone_id):
             groups=groups)
 
 
-@zones.route('/<zone_id>/records')
-def zones_records(zone_id):
-    conn = get_connection()
-    resp = conn.get_hosted_zone(zone_id)
-    zone = resp['GetHostedZoneResponse']['HostedZone']
-
-    record_resp = sorted(conn.get_all_rrsets(zone_id), key=lambda x: x.type)
-
-    groups = groupby(record_resp, key=lambda x: x.type)
-
-    groups = [(k, list(v)) for k, v in groups]
-
-    return render_template('zones/records.html',
-            zone_id=zone_id,
-            zone=zone,
-            groups=groups)
-
-
 @zones.route('/clone/<zone_id>', methods=['GET', 'POST'])
-def zones_clone(zone_id):
+def clone(zone_id):
     conn = get_connection()
 
     zone_response = conn.get_hosted_zone(zone_id)

@@ -1,5 +1,6 @@
-from flaskext import wtf
-from flaskext.wtf import validators
+from flaskext.wtf import (validators, HiddenField, SelectField,
+    TextField, Form, TextAreaField, IntegerField)
+from flask import request
 
 
 RECORD_CHOICES = [
@@ -21,18 +22,23 @@ ALIAS_RECORD_CHOICES = [
 ]
 
 
-class ZoneForm(wtf.Form):
-    name = wtf.TextField('Domain Name', validators=[validators.Required()])
-    comment = wtf.TextAreaField('Comment')
+class PreviousHiddenField(HiddenField):
+    def process(self, formdata, data=None):
+        self.data = formdata.get(self.name,
+            formdata.get(self.name.replace('previous_', '')))
 
 
-class RecordForm(wtf.Form):
-    type = wtf.SelectField("Type", choices=RECORD_CHOICES)
-    name = wtf.TextField("Name", validators=[validators.Required()])
-    value = wtf.TextField("Value", validators=[validators.Required()])
-    ttl = wtf.IntegerField("TTL", default="86400",
-            validators=[validators.Required()])
-    comment = wtf.TextAreaField("Comment")
+class ZoneForm(Form):
+    name = TextField('Domain Name', validators=[validators.Required()])
+    comment = TextAreaField('Comment')
+
+
+class RecordForm(Form):
+    type = SelectField("Type", choices=RECORD_CHOICES)
+    name = TextField("Name", validators=[validators.Required()])
+    value = TextField("Value", validators=[validators.Required()])
+    ttl = IntegerField("TTL", default="86400", validators=[validators.Required()])
+    comment = TextAreaField("Comment")
 
     @property
     def values(self):
@@ -44,19 +50,42 @@ class RecordForm(wtf.Form):
             return [self.value.data.strip()]
 
 
-class RecordAliasForm(wtf.Form):
-    type = wtf.SelectField("Type", choices=ALIAS_RECORD_CHOICES)
-    name = wtf.TextField("Name", validators=[validators.Required()])
-    alias_hosted_zone_id = wtf.TextField("Alias hosted zone ID",
+class EditRecordForm(RecordForm):
+    previous_type = PreviousHiddenField("Type",
         validators=[validators.Required()])
 
-    alias_dns_name = wtf.TextField("Alias DNS name", validators=[validators.Required()])
+    previous_name = PreviousHiddenField("Name",
+        validators=[validators.Required()])
 
-    ttl = wtf.IntegerField("TTL", default="86400",
+    previous_value = PreviousHiddenField("Value",
+        validators=[validators.Required()])
+
+    previous_ttl = PreviousHiddenField("TTL",
+        validators=[validators.Required()])
+
+    @property
+    def previous_values(self):
+        if self.type.data != 'TXT':
+            return filter(lambda x: x,
+                      map(lambda x: x.strip(),
+                          self.previous_value.data.strip().split(';')))
+        else:
+            return [self.previous_value.data.strip()]
+
+
+class RecordAliasForm(Form):
+    type = SelectField("Type", choices=ALIAS_RECORD_CHOICES)
+    name = TextField("Name", validators=[validators.Required()])
+    alias_hosted_zone_id = TextField("Alias hosted zone ID",
+        validators=[validators.Required()])
+
+    alias_dns_name = TextField("Alias DNS name", validators=[validators.Required()])
+
+    ttl = IntegerField("TTL", default="86400",
             validators=[validators.Required()])
 
-    comment = wtf.TextAreaField("Comment")
+    comment = TextAreaField("Comment")
 
 
-class APIKeyForm(wtf.Form):
-    key = wtf.TextField('API Key', validators=[validators.Required()])
+class APIKeyForm(Form):
+    key = TextField('API Key', validators=[validators.Required()])
