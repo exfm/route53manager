@@ -24,7 +24,7 @@ def new_alias(zone_id):
 
     if form.validate_on_submit():
         changes = ResourceRecordSets(conn, zone_id, form.comment.data)
-        change = changes.add_change("CREATE", form.name.data, form.type.data)
+        change = changes.add_change("CREATE", form.name.data, form.type.data, form.ttl.data)
         change.set_alias(form.alias_hosted_zone_id.data,
             form.alias_dns_name.data)
         changes.commit()
@@ -48,11 +48,11 @@ def update_alias(zone_id):
 
         changes = ResourceRecordSets(conn, zone_id, form.comment.data)
 
-        change = changes.add_change("DELETE", form.name.data, form.type.data)
+        change = changes.add_change("DELETE", form.name.data, form.type.data, form.ttl.data)
         change.set_alias(form.alias_hosted_zone_id.data,
             form.alias_dns_name.data)
 
-        change = changes.add_change("CREATE", form.name.data, form.type.data)
+        change = changes.add_change("CREATE", form.name.data, form.type.data, form.ttl.data)
         change.set_alias(form.alias_hosted_zone_id.data,
             form.alias_dns_name.data)
 
