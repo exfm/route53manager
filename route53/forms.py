@@ -18,6 +18,7 @@ RECORD_CHOICES = [
 ALIAS_RECORD_CHOICES = [
     ('A', 'A'),
     ('AAAA', 'AAAA'),
+    ('CNAME', 'CNAME'),
 ]
 
 
